@@ -1,0 +1,83 @@
+/* Signup.css */
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Make sure container takes full viewport height */
+    background-color: #f0f0f0; /* Example background color */
+    padding: 20px;
+  }
+  
+  .signup-box {
+    background-color: white; /* White background for the form */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    width: 400px; /* Adjust width as needed */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Spacing between form elements */
+  }
+  
+  .signup-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333; /* Darker heading color */
+  }
+  
+  .input-group {
+    margin-bottom: 15px; /* Space between input groups */
+  }
+  
+  .signup-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .file-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background-color: #eee; /* Light background for file label */
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px dashed #ccc;  /* Dashed border for file input */
+    justify-content: center;
+  }
+  
+  .file-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+  
+  .file-input {
+    display: none; /* Hide the actual file input */
+  }
+  
+  .signup-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .signup-footer {
+    text-align: center;
+    margin-top: 15px;
+  }
+  
+  .signup-footer-text {
+    color: #777;
+    margin-right: 5px;
+  }
+  
+  .signup-footer-link {
+    color: #007bff; /* Example link color */
+    text-decoration: none;
+  }

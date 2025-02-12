@@ -1,0 +1,95 @@
+/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: #31363f;
+  padding-top: 91px;
+}
+
+.crd-image {
+  height: 200px;
+  padding: 10px;
+}
+
+.crd-title {
+  max-height: 50px;
+  overflow: hidden;
+}
+
+.crd-description {
+  max-height: 78px;
+  overflow: hidden;
+}
+
+.crd-btn {
+  margin-right: 1px;
+}
+
+.crd-col {
+  margin-top: 21px;
+}
+
+.signup-box {
+  background: #d9d9d9;
+  min-height: 500px;
+  max-width: 450px;
+}
+.update-box {
+  background: #d9d9d9;
+  min-height: 500px;
+  max-width: 400px;
+}
+
+.login-box {
+  background: #d9d9d9;
+  width: 300px;
+  height: 300px;
+}
+.banner-box {
+  background: #d9d9d9;
+  width: 300px;
+  height: 250px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.file-labal {
+  color: rgb(150, 149, 149);
+}
+
+.hover:hover {
+  opacity: 0.8;
+}
+.Mart {
+  color: white;
+  font-size: 40px;
+  font-weight: bolder;
+}
+
+.review-bar {
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  border-radius: 5px;
+}
+
+.title-hover:hover {
+  color: rgb(66, 74, 82);
+}
+
+.pr-card {
+  max-width: 500px;
+}
+.pr-card-img {
+  max-width: 300px;
+}
