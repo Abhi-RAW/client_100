@@ -88,15 +88,15 @@ export const Header = () => {
           className="d-flex align-items-center"
         >
           <Link to={"/"} className="nav-link d-flex align-items-center">
-            <span style={brandPartStyle}>New</span>
+            <span style={brandPartStyle}>K</span>
             <span style={brandPartStyle}>-</span>
-            <span style={brandPartStyle}>Buy</span>
+            <span style={brandPartStyle}>Store</span>
           </Link>
         </Navbar.Brand>
         <Navbar.Toggle className="bg-white" aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll" className="d-flex align-items-center">
           <Nav className="me-auto my-2 my-lg-0" navbarScroll>
-            {["iPhone", "Macbook", "iPad", "Airpods", "Watch"].map((item) => (
+            {["Mobile", "Laptop", "Watch", "Fashion","Headphone", "Beauty&Care"].map((item) => (
               <Link
                 key={item}
                 to={"/"}

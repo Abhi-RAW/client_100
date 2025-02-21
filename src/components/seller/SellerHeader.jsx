@@ -1,9 +1,9 @@
 import { Container, Navbar, NavDropdown, Form, Button, Nav } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { useRef } from "react";
 import { DarkMode } from "../shared/DarkMode";
 import { axiosInstance } from "../../config/axiosInstance";
+import { useRef } from "react";
 import { setSearchValue } from "../../redux/features/searchSlice";
 
 export const SellerHeader = () => {
@@ -23,7 +23,7 @@ export const SellerHeader = () => {
     }
   };
 
-  // Search functionality
+  // Searching  
   const handleSearch = () => dispatch(setSearchValue(inputValue.current.value));
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -32,7 +32,7 @@ export const SellerHeader = () => {
     }
   };
 
-  // Helper function for dropdowns
+  // function for dropdowns
   const dropdownItems = (title, links) => (
     <NavDropdown
       title={

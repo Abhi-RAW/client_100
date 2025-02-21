@@ -43,22 +43,51 @@ export const AdminHeader = () => {
       }}
     >
       <Container fluid>
+        {/* Brand Logo */}
         <Navbar.Brand className="mb-2 me-4">
           <Link to={"/admin"} className="nav-link hover" style={{ fontWeight: "bold", fontSize: "1.5rem", color: theme ? "#000" : "#fff" }}>
-            <K-Mart></K-Mart>
+            K-Mart
           </Link>
         </Navbar.Brand>
 
+        {/* Navbar Toggle for Mobile View */}
         <Navbar.Toggle className="bg-white" aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll" className="d-flex align-items-center justify-content-between">
+          {/* Dropdown Menus */}
           <div className="d-flex align-items-center">
-            <NavDropdownMenu title="Seller" theme={theme} options={[{ path: "/admin/sellers", label: "Sellers" }, { path: "/admin/inactive-sellers", label: "Inactive" }, { path: "/admin/delete-seller", label: "Delete" }]} />
-            <NavDropdownMenu title="User" theme={theme} options={[{ path: "/admin/users", label: "Users" }, { path: "/admin/inactive-users", label: "Inactive" }, { path: "/admin/delete-user", label: "Delete" }]} />
-            <NavDropdownMenu title="Product" theme={theme} options={[{ path: "/admin/products", label: "Products" }, { path: "/admin/add-product", label: "Add" }, { path: "/admin/delete-product", label: "Delete" }]} />
-            <NavDropdownMenu title="Banner" theme={theme} options={[{ path: "/admin/banners", label: "Banners" }, { path: "/admin/add-banner", label: "Add" }]} />
-            <NavDropdownMenu title="Order" theme={theme} options={[{ path: "/admin/orders-processing", label: "Processing" }, { path: "/admin/orders-success", label: "Success" }, { path: "/admin/orders-shipping", label: "Shipping" }, { path: "/admin/orders-delivery", label: "Out for Delivery" }, { path: "/admin/orders-delivered", label: "Delivered" }]} />
+            <NavDropdownMenu title="Seller" theme={theme} options={[
+              { path: "/admin/sellers", label: "Sellers" },
+              // { path: "/admin/inactive-sellers", label: "Inactive" },
+              { path: "/admin/delete-seller", label: "Delete" }
+            ]} />
+
+            <NavDropdownMenu title="User" theme={theme} options={[
+              { path: "/admin/users", label: "Users" },
+              // { path: "/admin/inactive-users", label: "Inactive" },
+              { path: "/admin/delete-user", label: "Delete" }
+            ]} />
+
+            <NavDropdownMenu title="Product" theme={theme} options={[
+              { path: "/admin/products", label: "Products" },
+              { path: "/admin/add-product", label: "Add" },
+              { path: "/admin/delete-product", label: "Delete" }
+            ]} />
+
+            <NavDropdownMenu title="Banner" theme={theme} options={[
+              { path: "/admin/banners", label: "Banners" },
+              { path: "/admin/add-banner", label: "Add" }
+            ]} />
+
+            <NavDropdownMenu title="Order" theme={theme} options={[
+              { path: "/admin/orders-processing", label: "Processing" },
+              { path: "/admin/orders-success", label: "Success" },
+              { path: "/admin/orders-shipping", label: "Shipping" },
+              { path: "/admin/orders-delivery", label: "Out for Delivery" },
+              { path: "/admin/orders-delivered", label: "Delivered" }
+            ]} />
           </div>
 
+          {/* Search Bar */}
           <SearchBar theme={theme} inputValue={inputValue} handleSearch={handleSearch} handleKeyDown={handleKeyDown} />
 
           {/* Profile & Dark Mode */}
@@ -123,14 +152,14 @@ const SearchBar = ({ theme, inputValue, handleSearch, handleKeyDown }) => (
         background: theme ? "#F5F0CD" : "#D9D9D9",
         border: "2px solid #ff9800",
         borderRadius: "5px",
-        transition: "border-color 0.3s ease-in-out",
-        width: "250px",
+        padding: "5px 10px",
+        color: theme ? "#000" : "#333",
       }}
-      className="me-2"
     />
     <Button
       variant="outline-light"
       onClick={handleSearch}
+      className="ms-2"
       style={{
         borderRadius: "5px",
         border: "2px solid #ff9800",
@@ -144,15 +173,11 @@ const SearchBar = ({ theme, inputValue, handleSearch, handleKeyDown }) => (
   </Form>
 );
 
-// Dropdown Item Style
+// Dropdown Item Styling
 const dropdownItemStyle = (theme) => ({
-  display: "flex",
-  alignItems: "center",
-  fontSize: "1rem",
-  fontWeight: "500",
-  padding: "10px 15px",
   color: theme ? "#000" : "#fff",
-  backgroundColor: theme ? "#fff" : "#333",
-  transition: "background 0.3s ease-in-out",
-  borderRadius: "5px",
+  fontWeight: "500",
+  cursor: "pointer",
 });
+
+export default AdminHeader;

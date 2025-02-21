@@ -52,7 +52,7 @@ export const Footer = () => {
         </ul>
       </Col>
       <span className={theme ? "text-secondary" : "text-white"}>
-        Copyright &copy; 2024-2025 store.com
+        Copyright &copy; 2024-2025 kmart.com
       </span>
     </Row>
   );

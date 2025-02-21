@@ -153,9 +153,9 @@ export const Login = ({ role = "user" }) => {
           Login
         </SubmitButton>
         <div>
-          <StyledLink to={user.forgotPassword} theme={theme}>
+          {/* <StyledLink to={user.forgotPassword} theme={theme}>
             Forgot password?
-          </StyledLink>
+          </StyledLink> */}
         </div>
         <div>
           Don't have an account? 

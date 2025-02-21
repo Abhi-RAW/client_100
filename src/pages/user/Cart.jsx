@@ -2,41 +2,94 @@ import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Button, Card, Row, Col, Container } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { axiosInstance } from "../../config/axiosInstance";
 import { OrderIcon } from "../../components/shared/OrderIcon";
 import { UnHappy } from "../../components/shared/UnHappy";
+import { setCartData } from "../../redux/features/cartSlice"; // ✅ Redux action
 
 export const Cart = () => {
-  // Get current theme
+  const dispatch = useDispatch();
   const { theme } = useSelector((state) => state.theme);
-
-  // Get cart data
   const { cartData } = useSelector((state) => state.cart);
 
-  // Add quantity
+  // Fetch fresh cart data
+  const fetchCartData = async () => {
+    try {
+      const response = await axiosInstance.get("/cart");
+      dispatch(setCartData(response.data)); // ✅ Update Redux store
+    } catch (error) {
+      console.error("Error fetching cart data:", error);
+    }
+  };
+
+  // **Add quantity**
   const addQuantity = async (productId) => {
     try {
+      const updatedCart = {
+        ...cartData,
+        products: cartData.products.map((product) =>
+          product.productId._id === productId
+            ? { ...product, quantity: product.quantity + 1 }
+            : product
+        ),
+        totalPrice: cartData.totalPrice + cartData.products.find(p => p.productId._id === productId).price, // ✅ Update total
+      };
+      dispatch(setCartData(updatedCart));
+
       await axiosInstance.post("/cart/add-cartQuantity", { productId });
+
       toast.success("Quantity increased");
+      fetchCartData(); // ✅ Fetch fresh data for accuracy
     } catch (error) {
       console.error(error);
       toast.error(error?.response?.data?.message || "Error while adding the product");
     }
   };
 
-  // Remove quantity
+  // **Remove quantity / Remove product if 0**
   const removeQuantity = async (productId) => {
     try {
-      await axiosInstance.delete("/cart/remove-product", { data: { productId } });
-      toast.success("Quantity decreased");
+      const product = cartData.products.find((p) => p.productId._id === productId);
+      if (!product) return;
+
+      if (product.quantity === 1) {
+        // ✅ Remove product from cart when quantity becomes zero
+        await axiosInstance.delete("/cart/remove-product", { data: { productId } });
+
+        const updatedCart = {
+          ...cartData,
+          products: cartData.products.filter((p) => p.productId._id !== productId),
+          totalPrice: cartData.totalPrice - product.price, // ✅ Update total
+        };
+        dispatch(setCartData(updatedCart));
+
+        toast.success("Removed from cart");
+      } else {
+        // ✅ Decrease quantity normally
+        const updatedCart = {
+          ...cartData,
+          products: cartData.products.map((product) =>
+            product.productId._id === productId
+              ? { ...product, quantity: product.quantity - 1 }
+              : product
+          ),
+          totalPrice: cartData.totalPrice - product.price, // ✅ Update total
+        };
+        dispatch(setCartData(updatedCart));
+
+        await axiosInstance.delete("/cart/remove-product", { data: { productId } });
+        toast.success("Quantity decreased");
+      }
+
+      fetchCartData(); // ✅ Fetch fresh data for accuracy
     } catch (error) {
       console.error(error);
       toast.error(error?.response?.data?.message || "Error while removing the product");
     }
   };
 
-  // Make payment
+  // **Make payment**
   const makePayment = async () => {
     try {
       const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
@@ -59,14 +112,7 @@ export const Cart = () => {
 
   return (
     <Container className="py-5" style={{ maxWidth: "1200px" }}>
-      <h1
-        className="text-center fw-bold my-4"
-        style={{
-          color: theme ? "#333" : "#F2F2F2",
-          fontSize: "3rem",
-          letterSpacing: "2px",
-        }}
-      >
+      <h1 className="text-center fw-bold my-4" style={{ color: theme ? "#333" : "#F2F2F2", fontSize: "3rem", letterSpacing: "2px" }}>
         🛒 Your Cart
       </h1>
 
@@ -83,91 +129,29 @@ export const Cart = () => {
             }}
           >
             <Col xs={12} md={3} className="text-center">
-              <Card.Img
-                className="img-fluid rounded-3 shadow-sm"
-                src={product.productId.image}
-                style={{
-                  height: "180px",
-                  objectFit: "cover",
-                  borderRadius: "12px",
-                  boxShadow: theme ? "0 4px 8px rgba(0, 0, 0, 0.5)" : "0 4px 8px rgba(0, 0, 0, 0.1)",
-                }}
-              />
+              <Card.Img className="img-fluid rounded-3 shadow-sm" src={product.productId.image} style={{ height: "180px", objectFit: "cover", borderRadius: "12px" }} />
             </Col>
             <Col xs={12} md={4} className="d-flex flex-column justify-content-center align-items-start">
-              <h5
-                style={{
-                  color: theme ? "#F2F2F2" : "#333",
-                  fontSize: "1.3rem",
-                  fontWeight: "bold",
-                  lineHeight: "1.5",
-                }}
-              >
+              <h5 style={{ color: theme ? "#F2F2F2" : "#333", fontSize: "1.3rem", fontWeight: "bold", lineHeight: "1.5" }}>
                 {product.productId.title}
               </h5>
-              <span
-                style={{
-                  color: theme ? "#AAA" : "#555",
-                  fontSize: "0.95rem",
-                  marginTop: "8px",
-                }}
-              >
+              <span style={{ color: theme ? "#AAA" : "#555", fontSize: "0.95rem", marginTop: "8px" }}>
                 {product.productId.description.substring(0, 90)}...
               </span>
             </Col>
             <Col xs={12} md={3} className="d-flex align-items-center justify-content-center">
-              <Button
-                onClick={() => removeQuantity(product.productId._id)}
-                className="rounded-circle border-0"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  backgroundColor: theme ? "#FF4C00" : "#444",
-                  color: "#FFF",
-                  fontSize: "20px",
-                  borderRadius: "50%",
-                  transition: "all 0.3s ease-in-out",
-                  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
-                }}
-              >
+              <Button onClick={() => removeQuantity(product.productId._id)} className="rounded-circle border-0" style={{ width: "40px", height: "40px", backgroundColor: theme ? "#FF4C00" : "#444", color: "#FFF", fontSize: "20px", borderRadius: "50%" }}>
                 −
               </Button>
-              <span
-                className="mx-3"
-                style={{
-                  fontSize: "1.25rem",
-                  fontWeight: "bold",
-                  color: theme ? "#F2F2F2" : "#333",
-                }}
-              >
+              <span className="mx-3" style={{ fontSize: "1.25rem", fontWeight: "bold", color: theme ? "#F2F2F2" : "#333" }}>
                 {product.quantity}
               </span>
-              <Button
-                onClick={() => addQuantity(product.productId._id)}
-                className="rounded-circle border-0"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  backgroundColor: theme ? "#FF4C00" : "#444",
-                  color: "#FFF",
-                  fontSize: "20px",
-                  borderRadius: "50%",
-                  transition: "all 0.3s ease-in-out",
-                  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
-                }}
-              >
+              <Button onClick={() => addQuantity(product.productId._id)} className="rounded-circle border-0" style={{ width: "40px", height: "40px", backgroundColor: theme ? "#FF4C00" : "#444", color: "#FFF", fontSize: "20px", borderRadius: "50%" }}>
                 +
               </Button>
             </Col>
             <Col xs={12} md={2} className="text-center d-flex flex-column justify-content-center align-items-center">
-              <h6
-                style={{
-                  color: theme ? "#F2F2F2" : "#333",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                  marginBottom: "12px",
-                }}
-              >
+              <h6 style={{ color: theme ? "#F2F2F2" : "#333", fontSize: "1.2rem", fontWeight: "bold", marginBottom: "12px" }}>
                 ₹{product.price * product.quantity}
               </h6>
             </Col>
@@ -176,50 +160,13 @@ export const Cart = () => {
       </div>
 
       {/* Total Section */}
-      <Row
-        className="rounded-3 shadow-lg p-5 mt-5 d-flex justify-content-between"
-        style={{
-          backgroundColor: theme ? "#FF4C00" : "#444",
-          color: theme ? "#333" : "#F2F2F2",
-          borderRadius: "15px",
-          boxShadow: theme ? "0 8px 16px rgba(0, 0, 0, 0.5)" : "0 8px 16px rgba(0, 0, 0, 0.1)",
-        }}
-      >
+      <Row className="rounded-3 shadow-lg p-5 mt-5 d-flex justify-content-between" style={{ backgroundColor: theme ? "#FF4C00" : "#444", color: theme ? "#333" : "#F2F2F2", borderRadius: "15px" }}>
         <Col className="d-flex flex-column justify-content-center align-items-start">
-          <h5
-            style={{
-              fontSize: "1.5rem",
-              fontWeight: "bold",
-              color: theme ? "#333" : "#F2F2F2",
-              marginBottom: "15px",
-            }}
-          >
-            Total:
-          </h5>
-          <h4
-            style={{
-              fontSize: "2rem",
-              fontWeight: "bold",
-              color: theme ? "#333" : "#F2F2F2",
-            }}
-          >
-            ₹{cartData.totalPrice || 0}
-          </h4>
+          <h5>Total:</h5>
+          <h4>₹{cartData.totalPrice || 0}</h4>
         </Col>
         <Col className="d-flex justify-content-center align-items-center">
-          <Button
-            onClick={makePayment}
-            className="fw-bold d-flex align-items-center justify-content-center py-3"
-            style={{
-              backgroundColor: theme ? "#333" : "#FF4C00",
-              color: theme ? "#F2F2F2" : "#333",
-              border: "none",
-              fontSize: "1.25rem",
-              borderRadius: "8px",
-              transition: "all 0.3s ease-in-out",
-              padding: "12px 40px",
-            }}
-          >
+          <Button onClick={makePayment}>
             <OrderIcon height={"25px"} className="me-2" />
             Place Order
           </Button>
