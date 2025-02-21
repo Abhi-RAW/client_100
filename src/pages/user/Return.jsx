@@ -2,66 +2,80 @@ import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../config/axiosInstance";
-import Button from "react-bootstrap/esm/Button";
+import Button from "react-bootstrap/Button";
 import { useSelector } from "react-redux";
 
 export const Return = () => {
-  // Get theme
+  // Get theme state
   const { theme } = useSelector((state) => state.theme);
 
-  // Config params
-  const {orderId} = useParams()
+  // Get order ID from URL params
+  const { orderId } = useParams();
 
-  //config register
+  // Form configuration
   const { register, handleSubmit } = useForm();
 
-  // config navigate
+  // Navigation configuration
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
-      // Api call
-      const response = await axiosInstance({
-        method: "POST",
-        url: `order/request-return/${orderId}`,
-        data,
-      });
-      toast.success("Return request send!");
+      await axiosInstance.post(`order/request-return/${orderId}`, data);
+      toast.success("Return request sent!");
 
-      // Navigate to orders
-      navigate('/user/orders');
+      // Redirect to user orders
+      navigate("/user/orders");
     } catch (error) {
-      toast.error("Return request failed");
+      toast.error(error.response?.data?.message || "Return request failed");
     }
   };
 
   return (
-    <div style={{ minHeight: "500px" }}>
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{
+        minHeight: "80vh",
+        backgroundColor: theme ? "#FFF6E3" : "#1e1e1e",
+      }}
+    >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className=" login-box mx-auto mt-5 d-flex flex-column gap-2 align-items-center justify-content-center rounded-3"
-        style={{ backgroundColor: theme ? "#FFF6E3" : "#d9d9d9" }}
+        className="p-4 rounded-4 shadow-lg"
+        style={{
+          maxWidth: "500px",
+          width: "100%",
+          backgroundColor: theme ? "#ffffff" : "#2c2c2c",
+        }}
       >
-        <h3 className="mt-2 fw-bold text-black">Return</h3>
+        <h3
+          className={`text-center fw-bold mb-4 ${
+            theme ? "text-dark" : "text-light"
+          }`}
+        >
+          Return Order
+        </h3>
 
-        <div>
+        <div className="mb-3">
           <textarea
-            className="rounded-2 border-0 px-4 py-2 text-center"
-            type="text"
+            className="form-control rounded-3 px-3 py-2"
             {...register("returnReason")}
-            placeholder="Reason"
+            placeholder="Enter return reason..."
+            rows="4"
             required
+            style={{
+              backgroundColor: theme ? "#f8f9fa" : "#3a3a3a",
+              color: theme ? "#000" : "#fff",
+            }}
           />
         </div>
-        <div>
-          <Button
-            className="rounded-2 border-0 px-4 py-2 hover text-black text-center text-white mt-1"
-            type="submit"
-            variant={theme ? "warning" : "dark"}
-          >
-            Submit
-          </Button>
-        </div>
+
+        <Button
+          className="w-100 rounded-3 fw-bold"
+          type="submit"
+          variant={theme ? "warning" : "light"}
+        >
+          Submit Request
+        </Button>
       </form>
     </div>
   );

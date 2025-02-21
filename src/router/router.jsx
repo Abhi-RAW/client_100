@@ -41,7 +41,9 @@ import { PressKit } from "../pages/Mart/PressKit";
 import { Design } from "../pages/Mart/Design";
 import { Marketing } from "../pages/Mart/Marketing";
 import { Advertisement } from "../pages/Mart/Advertisement";
-
+import { ReturnList } from "../pages/shared/ReturnList";
+import { ReturnDetails } from "../pages/shared/ReturnDetails";
+import { Return } from "../pages/user/Return";
 
 export const router = createBrowserRouter([
   {
@@ -149,10 +151,10 @@ export const router = createBrowserRouter([
             path: "payment-cancel",
             element: <PaymentCancel />,
           },
-          // {
-          //   path: "return/:orderId",
-          //   element: <Return />,
-          // },
+          {
+            path: "return/:orderId",
+            element: <Return />,
+          },
           {
             path: "add-review/:productId",
             element: <AddReview />,
@@ -204,7 +206,30 @@ export const router = createBrowserRouter([
             path: "update-product/:productId",
             element: <UpdateProduct role="seller" />,
           },
-
+          {
+            path: "return-list-returned",
+            element: <ReturnList action="Returned" role="seller" />,
+          },
+          {
+            path: "return-list-approved",
+            element: <ReturnList action="Approved" role="seller" />,
+          },
+          {
+            path: "return-list-rejected",
+            element: <ReturnList action="Rejected" role="seller" />,
+          },
+          {
+            path: "return-details-returned/:orderId",
+            element: <ReturnDetails action="Returned" role="seller" />,
+          },
+          {
+            path: "return-details-approved/:orderId",
+            element: <ReturnDetails action="Approved" role="seller" />,
+          },
+          {
+            path: "return-details-rejected/:orderId",
+            element: <ReturnDetails action="Rejected" role="seller" />,
+          },
           { path: "profile", element: <Profile role="seller" /> },
           {
             path: "banners",
@@ -284,30 +309,31 @@ export const router = createBrowserRouter([
             path: "products",
             element: <Products action="Update" role="admin" />,
           },
-          // {
-          //   path: "return-list-returned",
-          //   element: <ReturnList action="Returned" role="admin" />,
-          // },
-          // {
-          //   path: "return-list-approved",
-          //   element: <ReturnList action="Approved" role="admin" />,
-          // },
-          // {
-          //   path: "return-list-rejected",
-          //   element: <ReturnList action="Rejected" role="admin" />,
-          // },
-          // {
-          //   path: "return-details-returned/:orderId",
-          //   element: <ReturnDetails action="returned" role="admin" />,
-          // },
-          // {
-          //   path: "return-details-approved/:orderId",
-          //   element: <ReturnDetails action="Approved" role="admin" />,
-          // },
-          // {
-          //   path: "return-details-rejected/:orderId",
-          //   element: <ReturnDetails action="Rejected" role="admin" />,
-          // },
+          {
+            path: "return-list-returned",
+            element: <ReturnList action="Returned" role="admin" />,
+          },
+          {
+            path: "return-list-approved",
+            element: <ReturnList action="Approved" role="admin" />,
+          },
+          {
+            path: "return-list-rejected",
+            element: <ReturnList action="Rejected" role="admin" />,
+          },
+          {
+            path: "return-details-returned/:orderId",
+            element: <ReturnDetails action="returned" role="admin" />,
+          },
+          {
+            path: "return-details-approved/:orderId",
+            element: <ReturnDetails action="Approved" role="admin" />,
+          },
+          {
+            path: "return-details-rejected/:orderId",
+            element: <ReturnDetails action="Rejected" role="admin" />,
+          },
+
           {
             path: "delete-product",
             element: <Products role="admin" action="Delete" />,

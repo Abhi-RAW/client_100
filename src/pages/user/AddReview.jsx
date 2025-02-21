@@ -2,80 +2,95 @@ import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../config/axiosInstance";
-import Button from "react-bootstrap/esm/Button";
 import { useSelector } from "react-redux";
+import { Container, Card, Form, Button } from "react-bootstrap";
 
 export const AddReview = () => {
-  // Get theme
   const { theme } = useSelector((state) => state.theme);
-
-  // Config params
   const { productId } = useParams();
-
-  //config register
   const { register, handleSubmit } = useForm();
-
-  // config navigate
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
-      // Api call
-      const response = await axiosInstance({
-        method: "POST",
-        url: "/review/add-review",
-        data: { ...data, productId },
+      const response = await axiosInstance.post("/review/add-review", {
+        ...data,
+        productId,
       });
-      if(response){
-        navigate(`/product-details/${productId}`);
-      }
-      toast.success("Review added");
+      if (response) navigate(`/product-details/${productId}`);
+      toast.success("Review added successfully!");
     } catch (error) {
       console.log(error);
-      
       toast.error(error.response?.data?.message || "Something went wrong!");
     }
   };
 
   return (
-    <div>
-      <form
-        onSubmit={handleSubmit((data) => onSubmit(data, productId))}
-        className=" login-box mx-auto mt-5 d-flex flex-column gap-2 align-items-center justify-content-center rounded-3"
-        style={{ backgroundColor: theme ? "#FFF6E3" : "#d9d9d9", minHeight: '400px' }}
+    <Container
+      className="d-flex justify-content-center align-items-center"
+      style={{ minHeight: "100vh" }}
+    >
+      <Card
+        className="shadow-lg p-4"
+        style={{
+          maxWidth: "500px",
+          width: "100%",
+          backgroundColor: theme ? "#ffffff" : "#1e1e1e",
+          color: theme ? "#212529" : "#f8f9fa",
+          borderRadius: "12px",
+        }}
       >
-        <h3 className="mt-2 fw-bold text-black">Add Review</h3>
+        <h3 className="text-center fw-bold mb-4">Add a Review</h3>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <Form.Group className="mb-3">
+            <Form.Label>Rating (1-5)</Form.Label>
+            <Form.Control
+              type="number"
+              {...register("rating")}
+              placeholder="Enter rating"
+              required
+              min="1"
+              max="5"
+              className="rounded-3 p-2"
+              style={{
+                backgroundColor: theme ? "#f8f9fa" : "#2c2c2c",
+                color: theme ? "#212529" : "#f8f9fa",
+                border: "1px solid #ced4da",
+              }}
+            />
+          </Form.Group>
 
-        <div>
-          <input
-            className="rounded-2 border-0 px-4 py-2 text-center"
-            type="number"
-            {...register("rating")}
-            placeholder="Rating"
-            required
-          />
-        </div>
+          <Form.Group className="mb-3">
+            <Form.Label>Comment</Form.Label>
+            <Form.Control
+              as="textarea"
+              {...register("comment")}
+              placeholder="Write your review..."
+              required
+              rows={3}
+              className="rounded-3 p-2"
+              style={{
+                backgroundColor: theme ? "#f8f9fa" : "#2c2c2c",
+                color: theme ? "#212529" : "#f8f9fa",
+                border: "1px solid #ced4da",
+              }}
+            />
+          </Form.Group>
 
-        <div>
-          <textarea
-            className="rounded-2 border-0 px-3 py-2 text-center"
-            type="text"
-            {...register("comment")}
-            placeholder="Comment"
-            required
-          />
-        </div>
-
-        <div>
           <Button
-            className="rounded-2 border-0 px-4 py-2 hover text-center text-white mt-1"
             type="submit"
-            variant={theme ? "warning" : "dark"}
+            className="w-100 py-2 rounded-3"
+            style={{
+              backgroundColor: theme ? "#ffcc00" : "#ffcc00",
+              color: "#000",
+              fontWeight: "bold",
+              border: "none",
+            }}
           >
-            Submit
+            Submit Review
           </Button>
-        </div>
-      </form>
-    </div>
+        </Form>
+      </Card>
+    </Container>
   );
 };
