@@ -74,7 +74,7 @@ export const Wishlist = () => {
             </h1>
           ) : (
             <Link className="text-decoration-none" to={"/"}>
-              <UnHappy message={"Your wishlist is empty!"} theme={theme} />
+              <UnHappy message={" Tip: Start adding your favorite items to make your dreams come true. Your future self will thank you!"} theme={theme} />
             </Link>
           )}
         </Col>

@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { axiosInstance } from "../../config/axiosInstance";
 import { OrderIcon } from "../../components/shared/OrderIcon";
 import { UnHappy } from "../../components/shared/UnHappy";
-import { setCartData } from "../../redux/features/cartSlice"; // ✅ Redux action
+import { setCartData } from "../../redux/features/cartSlice"; // 
 
 export const Cart = () => {
   const dispatch = useDispatch();
@@ -17,7 +17,7 @@ export const Cart = () => {
   const fetchCartData = async () => {
     try {
       const response = await axiosInstance.get("/cart");
-      dispatch(setCartData(response.data)); // ✅ Update Redux store
+      dispatch(setCartData(response.data)); // 
     } catch (error) {
       console.error("Error fetching cart data:", error);
     }
@@ -33,7 +33,7 @@ export const Cart = () => {
             ? { ...product, quantity: product.quantity + 1 }
             : product
         ),
-        totalPrice: cartData.totalPrice + cartData.products.find(p => p.productId._id === productId).price, // ✅ Update total
+        totalPrice: cartData.totalPrice + cartData.products.find(p => p.productId._id === productId).price, 
       };
       dispatch(setCartData(updatedCart));
 
@@ -60,7 +60,7 @@ export const Cart = () => {
         const updatedCart = {
           ...cartData,
           products: cartData.products.filter((p) => p.productId._id !== productId),
-          totalPrice: cartData.totalPrice - product.price, // ✅ Update total
+          totalPrice: cartData.totalPrice - product.price, 
         };
         dispatch(setCartData(updatedCart));
 
@@ -105,7 +105,7 @@ export const Cart = () => {
   if (!cartData?.products?.length) {
     return (
       <Link className="text-decoration-none" to={"/"}>
-        <UnHappy message={"Your cart is empty!"} theme={theme} />
+        <UnHappy message={"🚨 Alert: Your cart is feeling a bit lonely. It could really use some items to keep it company! 🚨"} theme={theme} />
       </Link>
     );
   }

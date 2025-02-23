@@ -6,29 +6,21 @@ import { Link } from "react-router-dom";
 import { UnHappy } from "../../components/shared/UnHappy";
 
 export const UserOrders = () => {
-  // Get theme
   const { theme } = useSelector((state) => state.theme);
-
-  // Store order data
   const [orders, setOrders] = useState([]);
 
-  // Api call
+  // Fetch Orders
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const response = await axiosInstance({
-          method: "GET",
-          url: "/order/get-user-orders",
-        });
+        const response = await axiosInstance.get("/order/get-user-orders");
 
-        // Sort orders by createdAt field
-        const sortedOrders = response?.data?.data?.sort((a, b) => {
-          return new Date(b?.createdAt) - new Date(a?.createdAt); // sorting in descending order
-        });
-
+        const sortedOrders = response?.data?.data?.sort(
+          (a, b) => new Date(b?.createdAt) - new Date(a?.createdAt)
+        );
         setOrders(sortedOrders);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching orders:", error);
       }
     };
 
@@ -36,79 +28,105 @@ export const UserOrders = () => {
   }, []);
 
   return (
-    <Container style={{ minHeight: "400px" }}>
-      {orders.length !== 0 && (
-        <h1
-          className={
-            theme
-              ? "text-black h1 text-center fw-bold my-5"
-              : "text-white h1 text-center fw-bold my-5"
-          }
-        >
-          Orders
+    <Container className="py-4" style={{ minHeight: "100vh" }}>
+      
+      {/* Title */}
+      {orders.length > 0 && (
+        <h1 className={`text-center fw-bold my-4 ${theme ? "text-black" : "text-white"}`}>
+          My Orders
         </h1>
       )}
+
+      {/* No Orders */}
       {orders.length === 0 && (
-        <Link className="text-decoration-none" to={"/"}>
-          <UnHappy
-            message={"We are still waiting to take your first order!"}
-            theme={theme}
-          />
+        <Link to="/" className="text-decoration-none">
+          <UnHappy message="We are still waiting to take your first order!" theme={theme} />
         </Link>
       )}
+
+      {/* Order List */}
       {orders?.map((order) => (
-        <div key={order._id}>
-          {order.products.map((product) => (
-            <Row
-              className="d-flex justify-content-between align-items-center gap-3 my-2 p-3 rounded-3 mx-1"
-              key={product._id}
-              style={{ backgroundColor: theme ? "#FFF6E3" : "#d9d9d9" }}
-            >
-              <Col xs={12} md={2}>
-                <Card.Img
-                  className="img-fluid object-fit-contain rounded-3"
-                  src={product?.productId?.image}
-                  style={{ minHeight: "210px" }}
-                />
-              </Col>
-              <Col xs={12} md={3}>
-                <Card.Title className="fw-normal">
-                  {product?.productId?.title}
-                </Card.Title>
-              </Col>
-              <Col xs={12} md={2}>
-                <Card.Text className="fw-normal">{product?.quantity}</Card.Text>
-              </Col>
-              <Col xs={12} md={2}>
-                <Card.Text className="fw-normal">
+        <Card
+          key={order._id}
+          className="mb-4 shadow-sm border-0"
+          style={{
+            backgroundColor: theme ? "#FFF6E3" : "#1E1E1E",
+            color: theme ? "#000" : "#fff",
+            borderRadius: "12px",
+          }}
+        >
+          <Card.Header className="d-flex justify-content-between align-items-center p-3" 
+            style={{ 
+              backgroundColor: theme ? "#007BFF" : "#333",  // New Blue color
+              borderTopLeftRadius: "12px",
+              borderTopRightRadius: "12px",
+            }}>
+            <span className="fw-bold">Order ID: {order._id}</span>
+            <span className="fw-normal">
+              {new Date(order.createdAt).toLocaleDateString()}
+            </span>
+          </Card.Header>
+
+          <Card.Body>
+            {order.products.map((product) => (
+              <Row
+                key={product._id}
+                className="align-items-center py-3 px-2"
+                style={{
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.2)",
+                }}
+              >
+                {/* Product Image */}
+                <Col xs={12} md={2} className="text-center">
+                  <Card.Img
+                    src={product?.productId?.image}
+                    className="img-fluid rounded"
+                    style={{ maxHeight: "150px", objectFit: "contain" }}
+                  />
+                </Col>
+
+                {/* Product Title */}
+                <Col xs={12} md={4}>
+                  <Card.Title className="fw-semibold">{product?.productId?.title}</Card.Title>
+                  <Card.Text className="fw-light">Qty: {product?.quantity}</Card.Text>
+                </Col>
+
+                {/* Price */}
+                <Col xs={12} md={2} className="fw-bold">
                   ₹{product?.productId?.price * product?.quantity}
-                </Card.Text>
-              </Col>
-              <Col xs={12} md={2}>
-                {order.returnApprovalStatus === "approved" ||
-                order.returnApprovalStatus === "rejected" ? (
-                  <Card.Text className={theme ? "warning text-white" : "dark"}>
-                    {order.returnApprovalStatus === "approved"
-                      ? `Returned (${new Date(
-                          order.updatedAt
-                        ).toLocaleDateString()})`
-                      : `Rejected (${new Date(
-                          order.updatedAt
-                        ).toLocaleDateString()})`}
-                  </Card.Text>
-                ) : (
-                  <Link to={`/user/return/${order._id}`}>
-                    <Button
-                      variant={theme ? "warning text-white" : "dark text-white"}
+                </Col>
+
+                {/* Return Status / Button */}
+                <Col xs={12} md={4} className="text-center">
+                  {order.returnApprovalStatus === "approved" || order.returnApprovalStatus === "rejected" ? (
+                    <span
+                      className={`fw-bold px-3 py-1 rounded-pill ${order.returnApprovalStatus === "approved"
+                        ? "bg-success text-white"
+                        : "bg-danger text-white"
+                      }`}
                     >
-                      Return
-                    </Button>
-                  </Link>
-                )}
-              </Col>
-            </Row>
-          ))}
-        </div>
+                      {order.returnApprovalStatus.charAt(0).toUpperCase() + order.returnApprovalStatus.slice(1)}{" "}
+                      ({new Date(order.updatedAt).toLocaleDateString()})
+                    </span>
+                  ) : (
+                    <Link to={`/user/return/${order._id}`}>
+                      <Button
+                        className="fw-semibold px-3 py-2 rounded-pill"
+                        style={{
+                          backgroundColor: theme ? "#007BFF" : "#ff6347",  // Blue in Light Mode, Red in Dark Mode
+                          border: "none",
+                          color: theme ? "#fff" : "#fff",
+                        }}
+                      >
+                        Request Return
+                      </Button>
+                    </Link>
+                  )}
+                </Col>
+              </Row>
+            ))}
+          </Card.Body>
+        </Card>
       ))}
     </Container>
   );

@@ -3,29 +3,17 @@ import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { Button, Container } from "react-bootstrap";
+import { Button, Container, Form, Card } from "react-bootstrap";
 import { axiosInstance } from "../../config/axiosInstance";
 
-export const UpdateProduct = ({role = 'seller'}) => {
-  // Config params
+export const UpdateProduct = ({ role = "seller" }) => {
   const { productId } = useParams();
-
-  // Config navigate
   const navigate = useNavigate();
-
-  // Get current theme
   const { theme } = useSelector((state) => state.theme);
-
-  // Config react-hook-form
   const { register, handleSubmit, setValue, watch } = useForm();
-
-  // Handle product image preview
   const [imagePreview, setImagePreview] = useState("");
-
-  // Watch image input
   const imageFile = watch("image");
 
-  // Update image preview when image file changes
   useEffect(() => {
     if (imageFile && imageFile[0]) {
       const reader = new FileReader();
@@ -34,7 +22,6 @@ export const UpdateProduct = ({role = 'seller'}) => {
     }
   }, [imageFile]);
 
-  // Fetch product data on component load
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -59,7 +46,6 @@ export const UpdateProduct = ({role = 'seller'}) => {
     fetchProduct();
   }, [productId, setValue]);
 
-  // Handle form submission
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
@@ -71,13 +57,9 @@ export const UpdateProduct = ({role = 'seller'}) => {
         }
       }
 
-      const response = await axiosInstance(
-        {
-          method: "PUT",
-          url: `/product/update-product/${productId}`,
-          data: formData,
-        },
-
+      await axiosInstance.put(
+        `/product/update-product/${productId}`,
+        formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
@@ -97,110 +79,92 @@ export const UpdateProduct = ({role = 'seller'}) => {
   };
 
   return (
-    <Container>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        encType="multipart/form-data"
-        className="update-box mt-5 mx-auto d-flex flex-column align-items-center gap-2 p-4 rounded-3"
+    <Container className="d-flex justify-content-center mt-5">
+      <Card
+        className="p-4 shadow-lg rounded-4"
         style={{
-          backgroundColor: theme ? "#FFF6E3" : "#d9d9d9",
-          minHeight: "500px",
+          width: "100%",
+          maxWidth: "600px",
+          backgroundColor: theme ? "#FFF6E3" : "#f8f9fa",
         }}
       >
-        <h3 className="fw-bold">Update Product</h3>
+        <h3 className="fw-bold text-center mb-4">Update Product</h3>
 
-        <div>
-          {imagePreview && (
-            <div className="mt-2">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="img-fluid rounded ms-3"
-                style={{ maxHeight: "150px" }}
-              />
-            </div>
-          )}
-        </div>
-        <div>
-          <label className="bg-white file-label rounded-2 py-2 px-5">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6 me-1"
-              height={25}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"
-              />
-            </svg>
-            Update image
-            <input
-              className="rounded-2 border-0 px-5 py-2 text-center"
-              type="file"
-              {...register("image")}
-              accept="image/*"
+        {imagePreview && (
+          <div className="text-center mb-3">
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="img-fluid rounded shadow-sm"
+              style={{ maxHeight: "150px" }}
             />
-          </label>
-        </div>
+          </div>
+        )}
 
-        <div>
-          <input
-            className="rounded-2 border-0 px-4 py-2 text-center"
-            type="text"
-            placeholder="Title"
-            {...register("title", { required: true, maxLength: 100 })}
-          />
-        </div>
-        <div>
-          <textarea
-            className="rounded-2 border-0 px-3 py-2 text-center"
-            placeholder="Description"
-            {...register("description", {
-              required: true,
-              minLength: 20,
-              maxLength: 300,
-            })}
-            style={{ minHeight: "160px" }}
-          />
-        </div>
-        <div>
-          <input
-            className="rounded-2 border-0 px-4 py-2 text-center"
-            type="number"
-            placeholder="Price"
-            {...register("price", { required: true })}
-          />
-        </div>
-        <div>
-          <input
-            className="rounded-2 border-0 px-4 py-2 text-center"
-            type="number"
-            placeholder="Stock"
-            {...register("stock")}
-          />
-        </div>
-        <div>
-          <input
-            className="rounded-2 border-0 px-4 py-2 text-center"
-            type="text"
-            placeholder="Category"
-            {...register("category", { required: true })}
-          />
-        </div>
+        <Form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
+          <Form.Group className="mb-3 text-center">
+            <Form.Label className="btn btn-outline-primary w-100">
+              <input
+                type="file"
+                {...register("image")}
+                accept="image/*"
+                className="d-none"
+              />
+              Upload Image
+            </Form.Label>
+          </Form.Group>
 
-        <Button
-          variant={theme ? "warning" : "dark"}
-          className="rounded-2 border-0 px-4 py-2 text-white mt-1"
-          type="submit"
-        >
-          Update
-        </Button>
-      </form>
+          <Form.Group className="mb-3">
+            <Form.Control
+              type="text"
+              placeholder="Product Title"
+              {...register("title", { required: true, maxLength: 100 })}
+              className="shadow-sm"
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Control
+              as="textarea"
+              rows={3}
+              placeholder="Product Description"
+              {...register("description", { required: true, maxLength: 500 })}
+              className="shadow-sm"
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Control
+              type="number"
+              placeholder="Price"
+              {...register("price", { required: true, min: 0 })}
+              className="shadow-sm"
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Control
+              type="number"
+              placeholder="Stock"
+              {...register("stock", { required: true, min: 0 })}
+              className="shadow-sm"
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Control
+              type="text"
+              placeholder="Category"
+              {...register("category", { required: true, maxLength: 50 })}
+              className="shadow-sm"
+            />
+          </Form.Group>
+
+          <Button variant="success" type="submit" className="w-100 shadow-sm">
+            Update Product
+          </Button>
+        </Form>
+      </Card>
     </Container>
   );
 };

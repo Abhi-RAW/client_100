@@ -9,78 +9,46 @@ import { useEffect, useState } from "react";
 import { Loading } from "../../components/shared/Loading";
 
 export const ProductDetails = () => {
-  // Get current theme
   const { theme } = useSelector((state) => state.theme);
-
-  // Get user status
-  const { isUserAuth } = useSelector((state) => state.user);
-
-  // Config params
+  const { isUserAuth, user } = useSelector((state) => state.user);
   const { productId } = useParams();
-
-  // Config navigate
   const navigate = useNavigate();
 
-  // Store data
   const [reviewData, setReviewData] = useState([]);
   const [deleteReview, setDeleteReview] = useState(false);
-
-  // Handle loading
   const [loading, setLoading] = useState(true);
 
-  // Api call
   useEffect(() => {
     (async () => {
-      // Set loading true
-
       try {
-        const response = await axiosInstance({
-          method: "GET",
-          url: `/review/get-review/${productId}`,
-        });
+        const response = await axiosInstance.get(`/review/get-review/${productId}`);
         setReviewData(response.data.data);
-        // Handle loading
         setLoading(false);
       } catch (error) {
         console.log(error);
-        // Handle loading
         setLoading(false);
       }
     })();
   }, [deleteReview]);
 
-  // Api call
   const [productData] = useFetch(`/product/product-details/${productId}`);
 
-  // Add to cart
   const addToCart = async () => {
     if (isUserAuth) {
       try {
-        // Api call
-        const response = await axiosInstance({
-          method: "POST",
-          url: "/cart/add-product",
-          data: { productId },
-        });
+        await axiosInstance.post("/cart/add-product", { productId });
         toast.success("Product added to cart");
-        console.log(response);
       } catch (error) {
         toast.error(error.response.data.message);
-        console.log(error);
       }
     } else {
       navigate("/login");
     }
   };
 
-  // Delete review
   const handleDelete = async (reviewId) => {
     try {
-      const response = await axiosInstance({
-        method: "DELETE",
-        url: "/review/delete-review",
-        data: { reviewId },
-      });
+      await axiosInstance.delete("/review/delete-review", { data: { reviewId } });
       setDeleteReview(!deleteReview);
     } catch (error) {
       console.log(error);
@@ -88,43 +56,74 @@ export const ProductDetails = () => {
   };
 
   return (
-    <Container style={{ minHeight: 450 }}>
+    <Container style={{ minHeight: "100vh" }}>
       <h1
-        className={
-          theme
-            ? "h1 text-center fw-bold text-black mt-5"
-            : "h1 text-center fw-bold text-white mt-5"
-        }
+        className="text-center fw-bold mt-5"
+        style={{
+          fontSize: "2.8rem",
+          letterSpacing: "1px",
+          textTransform: "uppercase",
+          color: theme ? "#222" : "#F8F8F8", // Dark mode: Light gray | Light mode: Deep black
+          textShadow: theme ? "1px 1px 4px rgba(255,255,255,0.2)" : "1px 1px 3px rgba(0,0,0,0.3)", // Subtle shadow for better visibility
+        }}
       >
         Product Details
       </h1>
+
       {loading ? (
         <Loading />
       ) : (
-        <Row>
+        <Row className="mt-4">
+          {/* Product Image & Info */}
           <Col xs={12} md={6}>
             <Card
-              className="crd-box d-flex justify-content-center align-items-center mt-5 mx-auto pr-card"
-              style={{ backgroundColor: theme ? "#FFF6E3" : "#d9d9d9" }}
+              className="product-card shadow-sm border-0 mx-auto"
+              style={{
+                background: theme ? "#1E1E1E" : "#F7F7F7",
+                color: theme ? "#EAEAEA" : "#222",
+                borderRadius: "12px",
+                border: theme ? "none" : "1px solid #DDDDDD",
+              }}
             >
               <Card.Img
-                className="object-fit-contain pr-card-img p-2"
+                className="product-image p-3"
                 variant="top"
                 src={productData?.image}
+                style={{
+                  borderRadius: "10px",
+                  maxHeight: "350px",
+                  objectFit: "contain",
+                  transition: "transform 0.3s ease",
+                }}
+                onMouseOver={(e) => (e.target.style.transform = "scale(1.03)")}
+                onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
               />
               <Card.Body>
-                <Card.Title>{productData?.title}</Card.Title>
-
-                <Card.Text>{productData?.description}</Card.Text>
-                <Card.Text className=" crd-price fw-bold text-center fw-bolder h5">
-                  ₹{productData?.price}
+                <Card.Title className="fw-bold text-center">{productData?.title}</Card.Title>
+                <Card.Text
+                  className="text-center"
+                  style={{
+                    color: theme ? "#CFCFCF" : "#444",
+                    fontSize: "1.1rem",
+                  }}
+                >
+                  {productData?.description}
                 </Card.Text>
+                <Card.Text className="text-center fw-bold h3">₹{productData?.price}</Card.Text>
+
+                {/* Buy Now Button */}
                 <Button
                   onClick={addToCart}
-                  className={
-                    theme ? "w-100 mt-1 text-white" : "w-100 mt-1 text-white"
-                  }
-                  variant={theme ? "warning" : "dark"}
+                  className="w-100 fw-semibold py-2 mt-2"
+                  style={{
+                    background: theme ? "#00A9D8" : "#3A7BD5",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "8px",
+                    transition: "0.3s",
+                  }}
+                  onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
+                  onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
                 >
                   <BuyNow />
                   Buy Now
@@ -132,30 +131,73 @@ export const ProductDetails = () => {
               </Card.Body>
             </Card>
           </Col>
+
+          {/* Reviews Section */}
           <Col>
             <Card
-              className="mt-5"
-              style={{ backgroundColor: theme ? "#FFF6E3" : "#d9d9d9" }}
+              className="reviews-card shadow-sm"
+              style={{
+                background: theme ? "#2A2A2A" : "#EFEFEF",
+                borderRadius: "12px",
+                padding: "15px",
+              }}
             >
               <Card.Body>
-                <Card.Title className="text-center fw-bold p-2">
+                <Card.Title
+                  className="text-center fw-bold"
+                  style={{
+                    color: theme ? "#EAEAEA" : "#222",
+                    fontSize: "1.5rem",
+                  }}
+                >
                   Reviews
                 </Card.Title>
-                <ul className=" p-2">
+                <ul className="list-unstyled p-2">
                   {reviewData?.map((review) => (
                     <li
-                      className="list-unstyled d-flex justify-content-between border mb-2 p-2 gap-4"
+                      className="d-flex flex-column mb-3 p-3"
                       key={review._id}
+                      style={{
+                        borderRadius: "10px",
+                        background: theme ? "#3A3A3A" : "#F4F4F4",
+                        color: theme ? "#fff" : "#333",
+                        transition: "transform 0.3s ease",
+                      }}
+                      onMouseOver={(e) => (e.target.style.transform = "scale(1.02)")}
+                      onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
                     >
-                      <h6 className="fw-bold">{review?.userId?.name}</h6>
-                      <p>{review?.comment}</p>
-                      <Button
-                        onClick={() => handleDelete(review._id)}
-                        className="btn-sm text-white"
-                        variant={theme ? "warning" : "dark"}
-                      >
-                        Delete
-                      </Button>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h6 className="fw-bold">{review?.userId?.name}</h6>
+                        <small
+                          style={{
+                            fontSize: "0.85rem",
+                            color: theme ? "#A8A8A8" : "#666",
+                          }}
+                        >
+                          {new Date(review?.createdAt).toLocaleDateString()}
+                        </small>
+                      </div>
+                      <p className="m-0 mt-1">{review?.comment}</p>
+
+                      {/* Show delete button only if the logged-in user wrote the review */}
+                      {user && user.id === review?.userId?._id && (
+                        <Button
+                          onClick={() => handleDelete(review._id)}
+                          className="btn-sm fw-semibold mt-2"
+                          style={{
+                            backgroundColor: "#FF6B6B",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "5px 10px",
+                            transition: "0.3s",
+                          }}
+                          onMouseOver={(e) => (e.target.style.opacity = "0.8")}
+                          onMouseOut={(e) => (e.target.style.opacity = "1")}
+                        >
+                          Delete
+                        </Button>
+                      )}
                     </li>
                   ))}
                 </ul>
