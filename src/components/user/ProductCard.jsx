@@ -1,13 +1,12 @@
 import { Card, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../config/axiosInstance";
 import { StarRatings } from "../shared/StarRatings";
 import { AverageRatings } from "../shared/AverageRatings";
-// New cart icon
-import { FaShoppingCart } from 'react-icons/fa'; // Importing a new cart icon
+import { FaShoppingCart } from "react-icons/fa"; // New cart icon
 import { WishlistIcon } from "../shared/WishlistIcon";
 
 export const ProductCard = ({ product }) => {
@@ -15,8 +14,20 @@ export const ProductCard = ({ product }) => {
   const { isUserAuth } = useSelector((state) => state.user);
   const { wishlistData } = useSelector((state) => state.wishlist);
   
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  
   const [average, setAverage] = useState(0);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  // Check if product is already in wishlist
+  useEffect(() => {
+    if (wishlistData?.products) {
+      setIsInWishlist(
+        wishlistData.products.some((p) => p?.productId?._id === product?._id)
+      );
+    }
+  }, [wishlistData, product]);
 
   // Add to Cart Function
   const addToCart = async (productId) => {
@@ -30,28 +41,27 @@ export const ProductCard = ({ product }) => {
     }
   };
 
-  // Wishlist Toggle Function
-  const wishlistHandler = async (productId) => {
+  // Wishlist Toggle Function (Optimized)
+  const wishlistHandler = useCallback(async () => {
     if (!isUserAuth) return navigate("/login");
 
-    const found = wishlistData?.products?.find(
-      (p) => p?.productId?._id === productId
-    );
+    setIsInWishlist((prev) => !prev); // Instant UI update
 
     try {
-      if (found) {
+      if (isInWishlist) {
         await axiosInstance.delete("/wishlist/remove-product", {
-          data: { productId: found.productId._id },
+          data: { productId: product?._id },
         });
         toast.success("Removed from wishlist!");
       } else {
-        await axiosInstance.post("/wishlist/add-product", { productId });
+        await axiosInstance.post("/wishlist/add-product", { productId: product?._id });
         toast.success("Added to wishlist!");
       }
     } catch (error) {
       toast.error("Error updating wishlist");
+      setIsInWishlist((prev) => !prev); // Revert UI if API fails
     }
-  };
+  }, [isInWishlist, isUserAuth, navigate, product]);
 
   return (
     <Card
@@ -73,12 +83,12 @@ export const ProductCard = ({ product }) => {
       <div className="d-flex justify-content-between align-items-center p-2">
         <span
           className="d-flex align-items-center"
-          onClick={() => wishlistHandler(product?._id)}
+          onClick={wishlistHandler}
           style={{ cursor: "pointer", transition: "transform 0.3s" }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.2)")}
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
-          <WishlistIcon productId={product?._id} />
+          <WishlistIcon filled={isInWishlist} />
         </span>
         <span
           className={`badge ${product.stock !== 0 ? "bg-success" : "bg-danger"} text-white`}
@@ -93,6 +103,8 @@ export const ProductCard = ({ product }) => {
           className="object-fit-contain"
           variant="top"
           src={product?.image || "https://via.placeholder.com/150"}
+          alt={product?.title}
+          loading="lazy" // Lazy load image
           style={{ height: "220px", padding: "10px" }}
         />
       </Link>
@@ -120,7 +132,7 @@ export const ProductCard = ({ product }) => {
 
         {/* Ratings */}
         <div className="d-flex justify-content-center align-items-center mt-2">
-          <Link to={isUserAuth && product ? `/user/add-review/${product._id}` : "/login"}>
+          <Link to={isUserAuth ? `/user/add-review/${product._id}` : "/login"}>
             <StarRatings
               productId={product?._id}
               getAverageRating={setAverage}
@@ -135,7 +147,7 @@ export const ProductCard = ({ product }) => {
           <AverageRatings average={average} />
         </div>
 
-        {/* Add to Cart Button */}
+        {/* Add to Cart Button (Disabled if out of stock) */}
         <Button
           className="w-100 mt-3 d-flex align-items-center justify-content-center fw-bold rounded-pill"
           variant={theme ? "warning" : "dark"}
@@ -143,10 +155,12 @@ export const ProductCard = ({ product }) => {
           onMouseEnter={(e) => (e.currentTarget.style.background = "#ff9800")}
           onMouseLeave={(e) => (e.currentTarget.style.background = theme ? "#ffc107" : "#212529")}
           onClick={() => addToCart(product?._id)}
+          disabled={product.stock === 0}
         >
-          {/* New Cart Icon */}
           <FaShoppingCart size={25} />
-          <span className="ms-2">Add to Cart</span>
+          <span className="ms-2">
+            {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+          </span>
         </Button>
       </Card.Body>
     </Card>
