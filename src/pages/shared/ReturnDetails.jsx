@@ -69,7 +69,7 @@ export const ReturnDetails = ({ role = "admin" }) => {
       <h1
         className={
           theme
-            ? "text-black  h1 text-center fw-bold my-5"
+            ? "text-black h1 text-center fw-bold my-5"
             : "text-white h1 text-center fw-bold my-5"
         }
       >
@@ -90,9 +90,10 @@ export const ReturnDetails = ({ role = "admin" }) => {
             />
           </Col>
           <Col xs={12} md={3}>
-            <Card.Title className="fw-normal">
-              {product.productId.title}
-            </Card.Title>
+            <Card.Title className="fw-normal">{product.productId.title}</Card.Title>
+            <Card.Text className="fw-normal text-muted">
+              <strong>Reason:</strong> {product.returnReason || "No reason provided"}
+            </Card.Text>
           </Col>
           <Col xs={12} md={2}>
             <Card.Text className="fw-normal">{product.quantity}</Card.Text>
@@ -107,16 +108,16 @@ export const ReturnDetails = ({ role = "admin" }) => {
               <>
                 <Button
                   onClick={() => actionHandler("approve")}
-                  className="text-white me-1  "
-                  variant={theme ? "warning " : "dark "}
+                  className="text-white me-1"
+                  variant={theme ? "warning" : "dark"}
                 >
                   <span className="me-1"></span>
                   Approve
                 </Button>
                 <Button
                   onClick={() => actionHandler("reject")}
-                  className=" text-white "
-                  variant={theme ? "warning " : "dark "}
+                  className="text-white"
+                  variant={theme ? "warning" : "dark"}
                 >
                   <span className="me-1"></span>
                   Reject
